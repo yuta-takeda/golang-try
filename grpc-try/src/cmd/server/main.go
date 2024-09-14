@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"io"
@@ -114,6 +116,10 @@ func main() {
 	s := grpc.NewServer()
 
 	hellopb.RegisterGreetingServiceServer(s, NewMyServer())
+
+	healthSrv := health.NewServer()
+	healthpb.RegisterHealthServer(s, healthSrv)
+	healthSrv.SetServingStatus("mygrpc", healthpb.HealthCheckResponse_SERVING)
 
 	reflection.Register(s)
 
